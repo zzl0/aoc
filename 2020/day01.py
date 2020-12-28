@@ -16,7 +16,7 @@ def day1_2(nums: Set[int]) -> int:
 
 
 if __name__ == "__main__":
-    nums = set(data(day=1, type=int))
+    nums = set(data(1, int))
     print(f'day1_1: {day1_1(nums)}')
     print(f'day1_2: {day1_2(nums)}')
 

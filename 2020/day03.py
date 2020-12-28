@@ -19,3 +19,5 @@ if __name__ == "__main__":
     matrix = data(3)
     print(f"day3_1: {day3_1(matrix)}")
     print(f"day3_2: {day3_2(matrix)}")
+    # day3_1: 193
+    # day3_2: 1355323200

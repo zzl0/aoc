@@ -8,7 +8,7 @@ from dataclasses import dataclass
 
 def data(day: int, parse=str, sep='\n') -> List:
     with open(f'data/day{day:02d}.txt') as f:
-        items = f.read().strip().split(sep)
+        items = re.split(sep, f.read().strip())
         return list(map(parse, items))
 
 
