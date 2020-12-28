@@ -1,4 +1,6 @@
 import re
+import operator
+import functools
 from typing import List, Set
 from itertools import combinations
 from dataclasses import dataclass
