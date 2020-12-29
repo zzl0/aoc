@@ -4,7 +4,7 @@ import functools
 from typing import List, Set
 from itertools import combinations
 from dataclasses import dataclass
-from collections import defaultdict
+from collections import defaultdict, Counter
 
 
 def data(day: int, parse=str, sep='\n') -> List:
