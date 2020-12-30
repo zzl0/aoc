@@ -19,3 +19,7 @@ def first(iterable, default=None) -> object:
 
 def count(iterable, pred=bool) -> int:
     return sum(pred(x) for x in iterable)
+
+
+def count_matrix(matrix, pred=bool) -> int:
+    return sum(pred(x) for row in matrix for x in row)
