@@ -1,7 +1,7 @@
 import re
 import operator
 import functools
-from typing import List, Set
+from typing import List, Set, Tuple
 from itertools import combinations
 from dataclasses import dataclass
 from collections import defaultdict, Counter
@@ -23,3 +23,7 @@ def count(iterable, pred=bool) -> int:
 
 def count_matrix(matrix, pred=bool) -> int:
     return sum(pred(x) for row in matrix for x in row)
+
+
+def product(numbers) -> int:
+    return functools.reduce(operator.mul, numbers, 1)
