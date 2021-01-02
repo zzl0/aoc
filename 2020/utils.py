@@ -1,8 +1,9 @@
 import re
 import operator
 import functools
-from typing import List, Set, Tuple
-from itertools import combinations
+import itertools
+from typing import List, Set, Tuple, Iterable
+from itertools import combinations, chain
 from dataclasses import dataclass
 from collections import defaultdict, Counter
 
@@ -27,3 +28,11 @@ def count_matrix(matrix, pred=bool) -> int:
 
 def product(numbers) -> int:
     return functools.reduce(operator.mul, numbers, 1)
+
+
+def max_min(lst) -> Tuple:
+    return max(lst), min(lst)
+
+
+def flatten(iterable) -> Iterable:
+    return chain.from_iterable(iterable)
