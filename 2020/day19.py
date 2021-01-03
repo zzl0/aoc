@@ -1,4 +1,4 @@
-# This solution is copied from https://github.com/norvig/pytudes/blob/master/ipynb/Advent-2020.ipynb
+# This solution is based on https://github.com/norvig/pytudes/blob/master/ipynb/Advent-2020.ipynb
 from utils import *
 
 Char = str
