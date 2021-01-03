@@ -2,7 +2,7 @@ import re
 import operator
 import functools
 import itertools
-from typing import List, Set, Tuple, Iterable
+from typing import List, Set, Tuple, Iterable, Union, Dict
 from itertools import combinations, chain
 from dataclasses import dataclass
 from collections import defaultdict, Counter
@@ -36,3 +36,6 @@ def max_min(lst) -> Tuple:
 
 def flatten(iterable) -> Iterable:
     return chain.from_iterable(iterable)
+
+def lines(s) -> List[str]:
+    return s.strip().split('\n')
