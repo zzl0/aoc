@@ -27,55 +27,30 @@ impl PasswordPolicy {
     }
 }
 
-#[derive(thiserror::Error, Debug)]
-enum ParseError {
-    #[error("expected {0}")]
-    Expected(&'static str),
-}
-
 fn parse_line(s: &str) -> Result<(PasswordPolicy, &str)> {
     // 1-4 j: jjjqzmgbjwpj
-    let (policy, password) = {
-        let mut tokens = s.split(':');
-        (
-            tokens
-                .next()
-                .ok_or(ParseError::Expected("password policy"))?,
-            tokens
-                .next()
-                .ok_or(ParseError::Expected("password"))?
-                .trim(),
-        )
-    };
+    peg::parser! {
+        grammar parser() for str {
+            rule number() -> usize
+                = n:$(['0'..='9']+) { n.parse().unwrap() }
 
-    let (range, byte) = {
-        let mut tokens = policy.split(' ');
-        (
-            tokens.next().ok_or(ParseError::Expected("policy range"))?,
-            tokens.next().ok_or(ParseError::Expected("policy byte"))?,
-        )
-    };
+            rule range() -> RangeInclusive<usize>
+                = min:number() "-" max:number() { min..=max }
 
-    let byte = if byte.as_bytes().len() == 1 {
-        byte.as_bytes()[0]
-    } else {
-        return Err(ParseError::Expected("password policy byte to be exactly 1 byte").into());
-    };
+            rule byte() -> u8
+                = letter:$(['a'..='z']) { letter.as_bytes()[0] }
 
-    let (min, max) = {
-        let mut tokens = range.split('-');
-        (
-            tokens
-                .next()
-                .ok_or(ParseError::Expected("policy range (lower bound)"))?,
-            tokens
-                .next()
-                .ok_or(ParseError::Expected("policy range (upperbound)"))?,
-        )
-    };
+            rule password() -> &'input str
+                = letters:$([_]*) { letters }
 
-    let range = (min.parse()?)..=(max.parse()?);
-    Ok((PasswordPolicy { range, byte }, password))
+            pub(crate) rule line() -> (PasswordPolicy, &'input str)
+                = range:range() " " byte:byte() ": " password:password() {
+                    (PasswordPolicy{range, byte}, password)
+                }
+
+        }
+    }
+    Ok(parser::line(s)?)
 }
 
 fn part1(input: &str) -> Result<()> {
@@ -100,10 +75,10 @@ mod tests {
             byte: b'a',
         };
 
-        assert_eq!(pp.is_valid("zeus"), false, "no 'a's");
-        assert_eq!(pp.is_valid("hades"), true, "single 'a'");
-        assert_eq!(pp.is_valid("banana"), true, "three 'a's");
-        assert_eq!(pp.is_valid("aaaah"), false, "too many 'a's");
+        assert!(!pp.is_valid("zeus"), "no 'a's");
+        assert!(pp.is_valid("hades"), "single 'a'");
+        assert!(pp.is_valid("banana"), "three 'a's");
+        assert!(!pp.is_valid("aaaah"), "too many 'a's");
     }
 
     #[test]
@@ -117,15 +92,6 @@ mod tests {
                 },
                 "banana"
             )
-        );
-
-        assert_eq!(
-            parse_line("1-3 a").unwrap_err().to_string(),
-            "expected password"
-        );
-        assert_eq!(
-            parse_line("1-3 : banana").unwrap_err().to_string(),
-            "expected password policy byte to be exactly 1 byte"
         );
     }
 }
