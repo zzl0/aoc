@@ -5,6 +5,7 @@ fn main() -> Result<()> {
     let input = include_str!("../../../data/day02.txt");
 
     part1(input)?;
+    part2(input)?;
 
     Ok(())
 }
@@ -61,6 +62,62 @@ fn part1(input: &str) -> Result<()> {
         .count();
 
     println!("part1: {}", count);
+    Ok(())
+}
+
+#[derive(Debug, PartialEq)]
+struct PasswordPolicy2 {
+    byte: u8,
+    positions: [usize; 2],
+}
+
+impl PasswordPolicy2 {
+    fn is_valid(&self, password: &str) -> bool {
+        self.positions
+            .iter()
+            .filter(|&&i| password.as_bytes()[i] == self.byte)
+            .count()
+            == 1
+    }
+}
+
+fn parse_line2(s: &str) -> Result<(PasswordPolicy2, &str)> {
+    // 1-4 j: jjjqzmgbjwpj
+    peg::parser! {
+        grammar parser() for str {
+            rule number() -> usize
+                = n:$(['0'..='9']+) { n.parse().unwrap() }
+
+            rule position() -> usize
+                = n:number() { n - 1 }
+
+            rule positions() -> [usize; 2]
+                = first:position() "-" second:position() { [first, second] }
+
+            rule byte() -> u8
+                = letter:$(['a'..='z']) { letter.as_bytes()[0] }
+
+            rule password() -> &'input str
+                = letters:$([_]*) { letters }
+
+            pub(crate) rule line() -> (PasswordPolicy2, &'input str)
+                = positions:positions() " " byte:byte() ": " password:password() {
+                    (PasswordPolicy2 { byte, positions }, password)
+                }
+
+        }
+    }
+    Ok(parser::line(s)?)
+}
+
+fn part2(input: &str) -> Result<()> {
+    let count = input
+        .lines()
+        .map(|line| parse_line2(line).unwrap())
+        .filter(|(policy, password)| policy.is_valid(password))
+        .count();
+
+    println!("part2: {}", count);
     Ok(())
 }
 
