@@ -16,12 +16,11 @@ fn part1(input: &str) {
     let answer: usize = input
         .split("\n\n")
         .map(|group| {
-            HashSet::<u8>::unions(
-                group
-                    .lines()
-                    .map(|line| line.as_bytes().iter().copied().collect()),
-            )
-            .len()
+            group
+                .lines()
+                .flat_map(|line| line.as_bytes().iter().copied())
+                .collect::<HashSet<u8>>()
+                .len()
         })
         .sum();
 
