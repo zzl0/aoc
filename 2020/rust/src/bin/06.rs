@@ -27,7 +27,24 @@ fn part1(input: &str) {
     println!("part1: {}", answer);
 }
 
+fn part2(input: &str) {
+    let init: HashSet<u8> = (b'a'..=b'z').collect();
+    let answer: usize = input
+        .split("\n\n")
+        .map(|group| {
+            group
+                .lines()
+                .map(|line| line.as_bytes().iter().copied().collect())
+                .fold(init.clone(), |acc, x| acc.intersection(x))
+                .len()
+        })
+        .sum();
+
+    println!("part2: {}", answer);
+}
+
 fn main() {
     let input = include_str!("../../../data/day06.txt");
     part1(input);
+    part2(input);
 }
