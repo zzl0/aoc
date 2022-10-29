@@ -1,4 +1,4 @@
-use im::HashSet;
+use std::collections::HashSet;
 use std::fmt;
 
 pub struct Answers(HashSet<u8>);
@@ -33,8 +33,8 @@ fn part2(input: &str) {
         .map(|group| {
             group
                 .lines()
-                .map(|line| line.as_bytes().iter().copied().collect())
-                .reduce(|acc: HashSet<u8>, x| acc.intersection(x))
+                .map(|line| line.as_bytes().iter().copied().collect::<HashSet<_>>())
+                .reduce(|acc, x| &acc & &x)
                 .unwrap_or_default()
                 .len()
         })
