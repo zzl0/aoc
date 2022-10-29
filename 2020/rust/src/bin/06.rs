@@ -28,14 +28,14 @@ fn part1(input: &str) {
 }
 
 fn part2(input: &str) {
-    let init: HashSet<u8> = (b'a'..=b'z').collect();
     let answer: usize = input
         .split("\n\n")
         .map(|group| {
             group
                 .lines()
                 .map(|line| line.as_bytes().iter().copied().collect())
-                .fold(init.clone(), |acc, x| acc.intersection(x))
+                .reduce(|acc: HashSet<u8>, x| acc.intersection(x))
+                .unwrap_or_default()
                 .len()
         })
         .sum();
