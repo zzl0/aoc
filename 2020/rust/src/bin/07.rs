@@ -82,6 +82,7 @@ fn parse_rules(input: &str) -> Rules<'_> {
     rules
 }
 
+#[allow(dead_code)]
 fn subgraph_contains(graph: &Rules<'_>, root: &(&str, &str), needle: &(&str, &str)) -> bool {
     if let Some(neighbors) = graph.get_vec(root) {
         for (_, neighbor) in neighbors {
@@ -103,6 +104,7 @@ fn reverse_graph<'a>(graph: &Rules<'a>) -> Rules<'a> {
     reverse
 }
 
+#[allow(dead_code)]
 fn walk_subgraph<'a>(graph: &Rules<'a>, root: &(&str, &str)) -> Vec<(&'a str, &'a str)> {
     let mut res: Vec<_> = Default::default();
     if let Some(neighbors) = graph.get_vec(root) {
@@ -114,6 +116,7 @@ fn walk_subgraph<'a>(graph: &Rules<'a>, root: &(&str, &str)) -> Vec<(&'a str, &'
     res
 }
 
+#[allow(dead_code)]
 fn walk_subgraph1<'a>(graph: &Rules<'a>, root: &(&str, &str), res: &mut Vec<(&'a str, &'a str)>) {
     if let Some(neighbors) = graph.get_vec(root) {
         for &(_quantity, neighbor) in neighbors {
@@ -123,6 +126,8 @@ fn walk_subgraph1<'a>(graph: &Rules<'a>, root: &(&str, &str), res: &mut Vec<(&'a
     }
 }
 
+// http://web.mit.edu/rust-lang_v1.25/arch/amd64_ubuntu1404/share/doc/rust/html/book/second-edition/ch19-02-advanced-lifetimes.html
+// 'elems is at least as long as 'iter
 fn walk_subgraph2<'iter, 'elems: 'iter>(
     graph: &'iter Rules<'elems>,
     root: &(&'iter str, &'iter str),
@@ -155,6 +160,7 @@ fn part1(rules: &Rules<'_>) {
     println!("part1: {:?}", colors_that_contain_shiny_gold);
 }
 
+#[allow(dead_code)]
 fn walk_subgraph3<'iter, 'elems: 'iter>(
     graph: &'iter Rules<'elems>,
     root: &(&'iter str, &'iter str),
