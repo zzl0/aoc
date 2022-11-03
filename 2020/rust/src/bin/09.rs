@@ -32,7 +32,11 @@ fn main() {
         .find(|&(_, _, sum)| sum == answer);
 
     let (n, i, _) = answers2.unwrap();
-    let set = &numbers[i..(i + n)];
-    let answer3 = set.iter().max().unwrap() + set.iter().min().unwrap();
+    let (min, max) = (&numbers[i..(i + n)])
+        .iter()
+        .minmax()
+        .into_option()
+        .unwrap();
+    let answer3 = min + max;
     dbg!(answer3);
 }
