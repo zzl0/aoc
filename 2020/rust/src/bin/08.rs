@@ -76,6 +76,7 @@ fn part1(program: &Program) {
     println!("part1: {:?}", answer);
 }
 
+#[allow(dead_code)]
 fn find_variant(program: &Program) {
     let mut variants: Vec<_> = program
         .iter()
