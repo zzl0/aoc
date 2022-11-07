@@ -35,7 +35,7 @@ impl fmt::Debug for Tile {
 }
 
 impl Tile {
-    fn next<I>(self, neighbors: I) -> Self
+    fn next<I>(self, neighbors: I, count: usize) -> Self
     where
         I: Iterator<Item = Self>,
     {
@@ -53,8 +53,8 @@ impl Tile {
                     .filter(|t| matches!(t, Self::OccupiedSeat))
                     .count()
                 {
-                    0..=3 => Self::OccupiedSeat,
-                    _ => Self::EmptySeat,
+                    _x if _x >= count => Self::EmptySeat,
+                    _ => Self::OccupiedSeat,
                 }
             }
         }
@@ -169,7 +169,6 @@ where
 
 impl Map<Tile> {
     fn parse(input: &[u8]) -> Self {
-        let input = input.strip_suffix(&[b'\n']).unwrap();
         let mut columns = 0;
         let mut rows = 1;
         for &c in input.iter() {
@@ -204,8 +203,19 @@ impl Map<Tile> {
     fn next(&self) -> Self {
         let mut res = Self::new(self.size);
         res.extend(
-            self.iter()
-                .map(|Positioned(pos, tile)| Positioned(pos, tile.next(self.neighbor_tiles(pos)))),
+            self.iter().map(|Positioned(pos, tile)| {
+                Positioned(pos, tile.next(self.neighbor_tiles(pos), 4))
+            }),
+        );
+        res
+    }
+
+    fn next2(&self) -> Self {
+        let mut res = Self::new(self.size);
+        res.extend(
+            self.iter().map(|Positioned(pos, tile)| {
+                Positioned(pos, tile.next(self.visible_seats(pos), 5))
+            }),
         );
         res
     }
@@ -215,6 +225,33 @@ impl Map<Tile> {
             .tuple_windows()
             .find_map(|(prev, next)| if prev == next { Some(next) } else { None })
             .unwrap()
+    }
+
+    fn last2(self) -> Self {
+        itertools::iterate(self, Map::next2)
+            .tuple_windows()
+            .find_map(|(prev, next)| if prev == next { Some(next) } else { None })
+            .unwrap()
+    }
+
+    fn visible_seats(&self, pos: Vec2) -> impl Iterator<Item = Tile> + '_ {
+        (-1..=1)
+            .flat_map(|dx| (-1..=1).map(move |dy| (dx, dy)))
+            .filter(|&(dx, dy)| !(dx == 0 && dy == 0))
+            .flat_map(move |(dx, dy)| {
+                itertools::iterate(pos, move |v| Vec2 {
+                    x: v.x + dx,
+                    y: v.y + dy,
+                })
+                .skip(1)
+                .map(move |pos| self.index(pos))
+                .while_some()
+                .filter_map(move |index| match self.tiles[index] {
+                    Tile::Floor => None,
+                    seat => Some(seat),
+                })
+                .take(1)
+            })
     }
 }
 
@@ -227,11 +264,21 @@ fn part1(map: Map<Tile>) {
     println!("part1: {}", answer);
 }
 
+fn part2(map: Map<Tile>) {
+    let last = map.last2();
+    let answer = last
+        .iter()
+        .filter(|p| matches!(p.1, Tile::OccupiedSeat))
+        .count();
+    println!("part2: {}", answer);
+}
+
 fn main() {
-    let input = include_bytes!("../../../data/day11.txt");
+    let input = include_str!("../../../data/day11.txt").trim().as_bytes();
     let map = Map::<Tile>::parse(input);
 
-    part1(map);
+    part1(map.clone());
+    part2(map);
 }
 
 #[test]
@@ -255,4 +302,48 @@ fn test_neighbor_positions() {
     ] {
         assert!(positions.contains(p));
     }
+}
+
+#[test]
+fn test_visible_seats() {
+    let map = Map::<Tile>::parse(
+        indoc::indoc!(
+            "
+            .......#.
+            ...#.....
+            .#.......
+            .........
+            ..#L....#
+            ....#....
+            .........
+            #........
+            ...#.....
+            "
+        )
+        .trim()
+        .as_bytes(),
+    );
+    println!("{:?}", map);
+    assert_eq!(map.visible_seats(Vec2 { x: 3, y: 4 }).count(), 8);
+    assert_eq!(map.visible_seats(Vec2 { x: 8, y: 0 }).count(), 2);
+}
+
+#[test]
+fn test_visible_seats2() {
+    let map = Map::<Tile>::parse(
+        indoc::indoc!(
+            "
+            .##.##.
+            #.#.#.#
+            ##...##
+            ...L...
+            ##...##
+            #.#.#.#
+            .##.##.
+            "
+        )
+        .trim()
+        .as_bytes(),
+    );
+    assert_eq!(map.visible_seats(Vec2 { x: 3, y: 3 }).count(), 0);
 }
