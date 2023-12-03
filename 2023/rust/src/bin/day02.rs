@@ -1,5 +1,5 @@
 fn parse_game(line: &str) -> Option<(usize, usize)> {
-    let (game_id, game) = line.trim_start_matches("Game ").split_once(":")?;
+    let (game_id, game) = line.trim_start_matches("Game ").split_once(':')?;
     let (mut r, mut g, mut b, mut possible) = (0, 0, 0, true);
     for round in game.split([';', ',']) {
         let (n, color) = round.trim().split_once(' ')?;
