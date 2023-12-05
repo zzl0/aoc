@@ -7,4 +7,14 @@ fi
 
 set -x
 touch input/$1.txt
-touch src/bin/$1.rs
+cat <<EOT > src/bin/$1.rs
+fn main() {
+    let input = include_str!("../../input/$1.txt");
+
+    // let p1 =
+    // println!("part1: {}", p1);
+
+    // let p2 =
+    // println!("part2: {}", p2);
+}
+EOT
